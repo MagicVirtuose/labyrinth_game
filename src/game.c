@@ -15,11 +15,12 @@
 void playUI(){
     if(SDL_Init(SDL_INIT_VIDEO) < 0 ){
 	printf("Error : %s ", SDL_GetError() );
-	
+    return;
     }
 
-    SDL_AudioSpec audio = audio_init();
-
+    if (audio_init() == -1){
+        return;
+    }
 
     SDL_Window * window = SDL_CreateWindow("Labyrinthe", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
@@ -39,40 +40,14 @@ void playUI(){
     int goal_x = goal[0];
     int goal_y = goal[1];
 
-    level_start(audio);
+    level_start();
     //Boucle principale
     while(run){
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        if(TTF_Init()==-1){
-            SDL_Quit();
-        }
-        TTF_Font* font = TTF_OpenFont("./assets/fonts/regular.ttf", 24);
-            if (font == NULL) {
-                fprintf(stderr, "error: font not found\n");
-                exit(EXIT_FAILURE);
-            }
-        
-            SDL_Color Green = {0, 255, 0};
-
-            // as TTF_RenderText_Solid could only be used on
-            // SDL_Surface then you have to create the surface first
-            snprintf(level_str,20, "level", level);
-            SDL_Surface* surfaceMessage = TTF_RenderText_Solid(font, level_str, Green);
-            SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
-            
-            SDL_Rect Message_rect;
-            Message_rect.x = 100;  
-            Message_rect.y = 100; 
-            Message_rect.w = 250; 
-            Message_rect.h = 250;
-            SDL_RenderCopy(renderer, Message, NULL, &Message_rect);
-
-            TTF_CloseFont(font);
-            SDL_FreeSurface(surfaceMessage);
-            SDL_DestroyTexture(Message);
+        //make_label(renderer, level, level_path);
             
         // Dessiner le labyrinthe
         for (int i = 0; i < HEIGHT; ++i) {
@@ -122,10 +97,10 @@ void playUI(){
             goal_x = goal[0];
             goal_y = goal[1];
 
-            level_clear(audio);
+            //level_clear();
 
             SDL_Delay(200);
-            level_start(audio);
+            level_start();
         }
 
 
@@ -138,19 +113,19 @@ void playUI(){
                 switch(event.key.keysym.sym){
                     case SDLK_UP:
                         move(labyrinth, 'u');
-                        //walk(audio);
+                        //walk();
                         break;
                     case SDLK_DOWN:
                         move(labyrinth, 'd');
-                        //walk(audio);
+                        //walk();
                         break;
                     case SDLK_LEFT:
                         move(labyrinth, 'l');
-                        //walk(audio);
+                        //walk();
                         break;
                     case SDLK_RIGHT:
                         move(labyrinth, 'r');
-                        //walk(audio);
+                        //walk();
                         break;
                     case SDLK_r:
                         snprintf(level_path, 20, "levels/%d.txt", level);
@@ -171,7 +146,37 @@ void playUI(){
     
 }
 
+/*void make_label(SDL_Renderer renderer, int level, char level_str){
+    if(TTF_Init()==-1){
+                SDL_Quit();
+            }
+            TTF_Font* font = TTF_OpenFont("./assets/fonts/regular.ttf", 24);
+                if (font == NULL) {
+                    fprintf(stderr, "error: font not found\n");
+                    exit(EXIT_FAILURE);
+                }
+            
+                SDL_Color Green = {0, 255, 0};
 
+                // as TTF_RenderText_Solid could only be used on
+                // SDL_Surface then you have to create the surface first
+                snprintf(level_str,20, "level", level);
+                SDL_Surface* surfaceMessage = TTF_RenderText_Solid(font, level_str, Green);
+                SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
+                
+                SDL_Rect Message_rect;
+                Message_rect.x = 100;  
+                Message_rect.y = 100; 
+                Message_rect.w = 250; 
+                Message_rect.h = 250;
+                SDL_RenderCopy(renderer, Message, NULL, &Message_rect);
+
+                TTF_CloseFont(font);
+                SDL_FreeSurface(surfaceMessage);
+                SDL_DestroyTexture(Message);
+
+    }
+*/
 void make_shadows(SDL_Renderer* renderer, SDL_Rect rect, char** labyrinth, int d, int i, int j, int x, int y){
 
     if (d > 1 && labyrinth[x][y] =='1'){
